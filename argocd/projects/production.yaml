@@ -10,6 +10,9 @@ spec:
     - https://github.com/limitedbug/infrastructure.git
 
   destinations:
+    - namespace: argocd
+      server: https://kubernetes.default.svc
+
     - namespace: simple-coffee
       server: https://kubernetes.default.svc
 
