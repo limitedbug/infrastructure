@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway-infrastructure
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/limitedbug/infrastructure.git
+    targetRevision: main
+    path: infrastructure/ingress/base
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
