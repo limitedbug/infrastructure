@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: arcadia
+  labels:
+    app.kubernetes.io/name: arcadia
+    # The image already runs as an unprivileged user, so the restricted
+    # profile costs nothing here and makes the API server — not code review —
+    # the thing that rejects a privileged pod.
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted

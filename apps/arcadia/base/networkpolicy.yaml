@@ -1,0 +1,83 @@
+# Default deny for the whole namespace: nothing reaches these pods, and these
+# pods reach nothing, unless a policy below says otherwise.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  labels:
+    app.kubernetes.io/name: arcadia
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: arcadia-allow-gateway
+  labels:
+    app.kubernetes.io/name: arcadia
+    app.kubernetes.io/component: web
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: arcadia
+      app.kubernetes.io/component: web
+  policyTypes:
+    - Ingress
+  ingress:
+    # Only the Envoy Gateway data-plane proxies may reach the app port. Envoy
+    # Gateway runs the generated proxy Deployment in the same namespace as its
+    # controller, which is envoy-gateway-system in a default install. Confirm
+    # yours before trusting this:
+    #   kubectl get pods -A -l app.kubernetes.io/name=envoy -o wide
+    # If the proxies live somewhere else, change the namespace name here or
+    # the site answers 503 with no pod ever being reached.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: envoy-gateway-system
+      ports:
+        - protocol: TCP
+          port: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: arcadia-allow-egress
+  labels:
+    app.kubernetes.io/name: arcadia
+    app.kubernetes.io/component: web
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: arcadia
+      app.kubernetes.io/component: web
+  policyTypes:
+    - Egress
+  egress:
+    # DNS. Atlas connection strings are mongodb+srv://, which resolves SRV and
+    # TXT records before any socket is opened, so this is not optional.
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # MongoDB (27017) and HTTPS (443, for the NextAuth OAuth providers) to
+    # anywhere. Deliberately not narrowed to an IP range: Atlas rotates the
+    # addresses behind a cluster's SRV record, so pinning them breaks on
+    # failover. Every other port stays denied by default-deny, which is what
+    # limits what a compromised pod could reach.
+    - ports:
+        - protocol: TCP
+          port: 27017
+        - protocol: TCP
+          port: 443

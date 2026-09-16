@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia
+  labels:
+    app.kubernetes.io/name: arcadia
+    app.kubernetes.io/component: web
+spec:
+  # ---------------------------------------------------------------------
+  # replicas IS PINNED TO 1 — this is not a placeholder, it is load-bearing.
+  #
+  # This app's real-time state (RoomRuntime: active game state, timers,
+  # debounced-persist handles — see src/server/rooms/RoomRegistry.ts in
+  # limitedbug/classic-fun-together-web) lives entirely in the memory of a
+  # single Node process, owned by whichever pod a given room's sockets happen
+  # to be connected to. There is no shared store or pub/sub between replicas:
+  # @socket.io/mongo-adapter is an installed dependency but is NOT wired up
+  # anywhere in the codebase, so two replicas would each think they own rooms
+  # the other does not know about.
+  #
+  # Until that is fixed (wire up the mongo-adapter for cross-pod pub/sub AND
+  # move RoomRuntime ownership to something crash-resumable/shared), this MUST
+  # stay at 1. Do not raise it "to be safe" — that makes things worse.
+  # ---------------------------------------------------------------------
+  replicas: 1
+  revisionHistoryLimit: 5
+  # Default RollingUpdate briefly runs the old and new pod at once — with a
+  # single-owner in-memory runtime that is the same multi-writer hazard as
+  # replicas > 1, just transient. Recreate guarantees the old pod is fully gone
+  # before the new one starts, at the cost of a short window of unavailability
+  # on every deploy.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: arcadia
+      app.kubernetes.io/component: web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: arcadia
+        app.kubernetes.io/component: web
+    spec:
+      automountServiceAccountToken: false
+      # Give in-flight moves time to flush (server.ts's SIGTERM handler closes
+      # sockets, flushes debounced Mongo writes, then closes the DB
+      # connections) before Kubernetes SIGKILLs the process.
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        # The uid/gid the image's Dockerfile creates for the `nextjs` user.
+        # Numeric on purpose: the kubelet enforces runAsNonRoot against a uid
+        # it can read without resolving names.
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: web
+          # Placeholder only — the production overlay pins the real tag.
+          image: ghcr.io/limitedbug/classic-fun-together-web:REPLACED_BY_OVERLAY
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: arcadia-config
+            # Created out of band, never from Git. See secret.example.yaml.
+            - secretRef:
+                name: arcadia-secrets
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            # NOT read-only on purpose: this image runs server.ts through tsx,
+            # which transpiles at startup and writes to a cache directory, and
+            # Next.js writes into .next/cache at runtime. A read-only root
+            # filesystem here buys very little and breaks both.
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+          # Liveness: fast, no dependency checks — a Mongo outage must not make
+          # Kubernetes kill this pod. That would drop every in-progress game
+          # for no benefit, since a fresh pod cannot reach Mongo either.
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          # Readiness: checks mongoose.connection.readyState — stop routing
+          # traffic here (without restarting) while Mongo is unreachable.
+          readinessProbe:
+            httpGet:
+              path: /api/health/ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              # No CPU limit: throttling a render or a game tick hurts latency
+              # more than a noisy neighbour does on a single-node VPS. Memory
+              # is capped because a leak must not take the node with it.
+              memory: 512Mi

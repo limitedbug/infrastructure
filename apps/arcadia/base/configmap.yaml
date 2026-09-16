@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: arcadia-config
+  labels:
+    app.kubernetes.io/name: arcadia
+    app.kubernetes.io/component: web
+data:
+  # NEXTAUTH_URL builds OAuth callback URLs and absolute links, so it must be
+  # the public URL a browser sees — https, even though the Gateway listener is
+  # plain HTTP: TLS is terminated in front of the cluster, and a callback URL
+  # of http:// would send users back to an address that redirects and breaks
+  # the OAuth state round-trip.
+  NEXTAUTH_URL: "https://arcadia.good-robert.com"
+  # Bind on all interfaces inside the pod so the kubelet's probes and the
+  # Service can reach it; the NetworkPolicy decides who may actually connect.
+  HOSTNAME: "0.0.0.0"
+  PORT: "3000"
+  NODE_ENV: "production"

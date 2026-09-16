@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: arcadia
+  labels:
+    app.kubernetes.io/name: arcadia
+    app.kubernetes.io/component: web
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: arcadia
+    app.kubernetes.io/component: web
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  # A client's Socket.IO polling/upgrade handshake must keep landing on the
+  # same pod for the life of the session. This does not actually enforce that
+  # for public traffic — Envoy Gateway load-balances straight to the pod
+  # EndpointSlice and never goes through the Service's kube-proxy rules, so
+  # sessionAffinity is bypassed on the ingress path. It holds only for
+  # in-cluster callers that dial the Service directly.
+  #
+  # What makes this safe today is `replicas: 1` (see deployment.yaml): there is
+  # exactly one pod to land on. If replicas ever goes above 1, consistent-hash
+  # affinity has to be configured on the Gateway side (an Envoy Gateway
+  # BackendTrafficPolicy), not here.
+  sessionAffinity: ClientIP

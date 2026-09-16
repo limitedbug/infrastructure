@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+labels:
+  - includeSelectors: false
+    pairs:
+      app.kubernetes.io/instance: production
+
+images:
+  # Pinned on purpose: a floating tag makes "what is running" unanswerable and
+  # a rollback impossible. Bump this to the tag (or @sha256 digest) you built
+  # and pushed — nothing publishes this image automatically yet, see the repo
+  # README.
+  - name: ghcr.io/limitedbug/classic-fun-together-web
+    newTag: v0.1.0

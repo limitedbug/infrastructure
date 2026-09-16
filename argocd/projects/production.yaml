@@ -22,6 +22,9 @@ spec:
     - namespace: arcadia
       server: https://kubernetes.default.svc
 
+    - namespace: portfolio
+      server: https://kubernetes.default.svc
+
     - namespace: quality-clean
       server: https://kubernetes.default.svc
 
@@ -29,12 +32,41 @@ spec:
     - group: gateway.networking.k8s.io
       kind: GatewayClass
 
+    # Each app owns its namespace as a manifest, so the namespace is created
+    # and labelled (Pod Security admission) by the same sync that deploys into
+    # it, instead of existing as undocumented cluster state.
+    - group: ""
+      kind: Namespace
+
+  # Anything not listed here is refused at sync time, so adding a new kind of
+  # resource is a deliberate edit to this file rather than a surprise.
+  #
+  # Secret is deliberately absent: secrets are created out of band against the
+  # cluster and must never be reconciled from Git.
   namespaceResourceWhitelist:
     - group: gateway.networking.k8s.io
       kind: Gateway
 
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-    
+
     - group: argoproj.io
       kind: Application
+
+    - group: ""
+      kind: ConfigMap
+
+    - group: ""
+      kind: Service
+
+    - group: ""
+      kind: ServiceAccount
+
+    - group: apps
+      kind: Deployment
+
+    - group: policy
+      kind: PodDisruptionBudget
+
+    - group: networking.k8s.io
+      kind: NetworkPolicy
