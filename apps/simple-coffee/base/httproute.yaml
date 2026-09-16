@@ -1,0 +1,22 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: simple-coffee
+  namespace: simple-coffee
+spec:
+  parentRefs:
+    - name: envoy-gateway
+      namespace: default
+
+  hostnames:
+    - simple-coffee.com
+
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+
+      backendRefs:
+        - name: simple-coffee-edge
+          port: 80
