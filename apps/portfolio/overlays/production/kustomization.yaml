@@ -14,8 +14,14 @@ images:
   # a rollback impossible.
   #
   # This is the image limitedbug/portfolio's release workflow actually
-  # publishes (IMAGE_NAME is github.repository). Note that its `pin` job still
-  # rewrites deploy/k8s/overlays/production/kustomization.yaml *inside that
-  # repo*, which is no longer what the cluster reads — see the repo README.
+  # publishes (IMAGE_NAME is github.repository).
+  #
+  # No leading "v": the workflow derives tags with docker/metadata-action's
+  # `type=semver,pattern={{version}}`, which strips it. Pushing git tag v1.0.0
+  # publishes the image tag 1.0.0, so that is what has to be pinned here.
+  #
+  # Note that the workflow's `pin` job still rewrites
+  # deploy/k8s/overlays/production/kustomization.yaml *inside that repo*, which
+  # is no longer what the cluster reads — see the repo README.
   - name: ghcr.io/limitedbug/portfolio
-    newTag: v1.0.0
+    newTag: "1.0.0"

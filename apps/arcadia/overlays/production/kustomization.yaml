@@ -15,4 +15,4 @@ images:
   # and pushed — nothing publishes this image automatically yet, see the repo
   # README.
   - name: ghcr.io/limitedbug/classic-fun-together-web
-    newTag: v0.1.0
+    newTag: "0.1.0"

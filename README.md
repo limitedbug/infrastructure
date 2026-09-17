@@ -35,7 +35,24 @@ ejecuta. Las copias que quedan en `limitedbug/portfolio` (`deploy/k8s/`) y en
 
 ## Antes del primer despliegue
 
-Hay tres cosas que este repo no puede hacer por ti.
+Hay cuatro cosas que este repo no puede hacer por ti.
+
+### 0. Aplicar el AppProject a mano
+
+**Nada sincroniza `argocd/projects/`.** `clusters/production/root.yaml` solo lee
+`argocd/applications`, así que el AppProject es el único fichero de este repo
+que se aplica manualmente:
+
+```sh
+kubectl apply -f argocd/projects/production.yaml
+```
+
+Hazlo **antes** de que las Applications nuevas lleguen a `main`. Si ArgoCD
+intenta sincronizar una app cuyo kind todavía no está en la lista blanca, la
+sync falla con `resource ... is not permitted in project production`, y hay que
+aplicar el proyecto y resincronizar a mano de todos modos.
+
+Cada vez que cambies ese fichero, vuelve a aplicarlo.
 
 ### 1. El Secret de ARCADIA
 
@@ -74,8 +91,8 @@ publicado de verdad:
   Hasta que lo tenga, hay que subirla a mano:
 
   ```sh
-  docker build -t ghcr.io/limitedbug/classic-fun-together-web:v0.1.0 .
-  docker push ghcr.io/limitedbug/classic-fun-together-web:v0.1.0
+  docker build -t ghcr.io/limitedbug/classic-fun-together-web:0.1.0 .
+  docker push ghcr.io/limitedbug/classic-fun-together-web:0.1.0
   ```
 
 Los paquetes de GHCR son **privados** por defecto. O bien los haces públicos
