@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring-production
+  namespace: argocd
+spec:
+  project: production
+
+  source:
+    repoURL: https://github.com/limitedbug/infrastructure.git
+    targetRevision: main
+    path: apps/monitoring/overlays/production
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
