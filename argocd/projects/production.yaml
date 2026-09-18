@@ -16,6 +16,9 @@ spec:
     - namespace: simple-coffee
       server: https://kubernetes.default.svc
 
+    - namespace: monitoring
+      server: https://kubernetes.default.svc
+
     - namespace: default
       server: https://kubernetes.default.svc
 
