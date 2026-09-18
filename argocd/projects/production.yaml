@@ -41,3 +41,12 @@ spec:
     
     - group: argoproj.io
       kind: Application
+
+    - group: ""
+      kind: PersistentVolumeClaim
+
+    - group: ""
+      kind: Service
+
+    - group: apps
+      kind: Deployment
