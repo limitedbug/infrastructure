@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: good-robert-com-tls
+  namespace: default
+spec:
+  secretName: good-robert-com-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  dnsNames:
+    - good-robert.com
+    - monitor.good-robert.com
+    - status.good-robert.com
+    - vault.good-robert.com
+    - simple-coffee.com

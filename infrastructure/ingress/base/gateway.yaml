@@ -5,6 +5,7 @@ metadata:
   namespace: default
 spec:
   gatewayClassName: envoy-gateway
+
   listeners:
     - name: http
       protocol: HTTP
@@ -22,6 +23,76 @@ spec:
         certificateRefs:
           - name: arcadia-good-robert-com-tls
             namespace: arcadia
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+
+    - name: https-good-robert
+      protocol: HTTPS
+      port: 443
+      hostname: good-robert.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: good-robert-com-tls
+            namespace: default
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+
+    - name: https-monitor
+      protocol: HTTPS
+      port: 443
+      hostname: monitor.good-robert.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: good-robert-com-tls
+            namespace: default
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+
+    - name: https-status
+      protocol: HTTPS
+      port: 443
+      hostname: status.good-robert.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: good-robert-com-tls
+            namespace: default
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+
+    - name: https-vault
+      protocol: HTTPS
+      port: 443
+      hostname: vault.good-robert.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: good-robert-com-tls
+            namespace: default
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All
+
+    - name: https-simple-coffee
+      protocol: HTTPS
+      port: 443
+      hostname: simple-coffee.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: good-robert-com-tls
+            namespace: default
             kind: Secret
       allowedRoutes:
         namespaces:
