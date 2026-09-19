@@ -39,6 +39,9 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
     
+    - group: cert-manager.io
+      kind: Certificate
+    
     - group: argoproj.io
       kind: Application
 
