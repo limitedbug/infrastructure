@@ -14,6 +14,8 @@ spec:
       labels:
         app: grafana
     spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       securityContext:
         fsGroup: 472
 
