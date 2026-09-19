@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: portfolio-runtime
+  labels:
+    app.kubernetes.io/name: portfolio-portfolio
+    app.kubernetes.io/component: web
+data:
+  # Bind on all interfaces inside the pod so the kubelet and the Service can
+  # reach the container; the NetworkPolicy is what limits who may connect.
+  HOST: "0.0.0.0"
+  PORT: "3000"
+  NODE_ENV: "production"

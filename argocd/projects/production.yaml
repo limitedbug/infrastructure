@@ -28,10 +28,14 @@ spec:
     - namespace: quality-clean
       server: https://kubernetes.default.svc
 
+    - namespace: portfolio
+      server: https://kubernetes.default.svc
+
   clusterResourceWhitelist:
     - group: gateway.networking.k8s.io
       kind: GatewayClass
-
+    - group: ""
+      kind: Namespace
   namespaceResourceWhitelist:
     - group: gateway.networking.k8s.io
       kind: Gateway
@@ -41,10 +45,10 @@ spec:
 
     - group: gateway.networking.k8s.io
       kind: ReferenceGrant
-    
+
     - group: cert-manager.io
       kind: Certificate
-    
+
     - group: argoproj.io
       kind: Application
 
@@ -54,14 +58,26 @@ spec:
     - group: ""
       kind: Service
 
-    - group: apps
-      kind: Deployment
-    
-    - group: apps
-      kind: StatefulSet
+    - group: ""
+      kind: ServiceAccount
 
     - group: ""
       kind: ConfigMap
 
     - group: ""
       kind: Secret
+
+    - group: apps
+      kind: Deployment
+
+    - group: apps
+      kind: StatefulSet
+
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+
+    - group: policy
+      kind: PodDisruptionBudget
+
+    - group: networking.k8s.io
+      kind: NetworkPolicy

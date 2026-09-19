@@ -1,0 +1,69 @@
+# Default deny for the whole namespace: nothing talks to these pods, and these
+# pods talk to nothing, unless a policy below says otherwise.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  labels:
+    app.kubernetes.io/name: portfolio-portfolio
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: portfolio-allow-ingress
+  labels:
+    app.kubernetes.io/name: portfolio-portfolio
+    app.kubernetes.io/component: web
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: portfolio-portfolio
+      app.kubernetes.io/component: web
+  policyTypes:
+    - Ingress
+  ingress:
+    # Only the ingress controller may reach the app port. Adjust the namespace
+    # label if your controller lives somewhere other than envoy-gateway-system.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: envoy-gateway-system
+      ports:
+        - protocol: TCP
+          port: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: portfolio-allow-dns
+  labels:
+    app.kubernetes.io/name: portfolio-portfolio
+    app.kubernetes.io/component: web
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: portfolio-portfolio
+      app.kubernetes.io/component: web
+  policyTypes:
+    - Egress
+  egress:
+    # DNS only. The server renders from data baked into the image and calls no
+    # outbound service; fonts are fetched by the visitor's browser, not by the
+    # pod. If that ever changes, add an explicit rule rather than widening this.
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: portfolio
+
+labels:
+  - includeSelectors: false
+    pairs:
+      app.kubernetes.io/part-of: portfolio-portfolio
+      app.kubernetes.io/managed-by: kustomize
+
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - httproute.yaml
+  - hpa.yaml
+  - pdb.yaml
+  - networkpolicy.yaml

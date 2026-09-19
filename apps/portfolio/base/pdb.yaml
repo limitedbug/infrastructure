@@ -1,0 +1,15 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: portfolio
+  labels:
+    app.kubernetes.io/name: portfolio-portfolio
+    app.kubernetes.io/component: web
+spec:
+  # Keeps a node drain from taking the whole site offline. Stated as a minimum
+  # rather than a maximum so it still holds when the HPA scales up.
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: portfolio-portfolio
+      app.kubernetes.io/component: web
