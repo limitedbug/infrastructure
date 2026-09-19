@@ -15,7 +15,7 @@ labels:
   # immutable digest it just pushed, so what runs in production is always a
   # build that exists and can be rolled back to.
 images:
-- digest: sha256:3ab476f179b5e6f38409070995994310c22288604f20f0409d1968842677462f
+- digest: sha256:990ac03330a3f91ad9c07d59b6ae183af75f470e0ddd0b3bb791fbe37ffef59d
   name: ghcr.io/limitedbug/portfolio
   newName: ghcr.io/limitedbug/portfolio
 
