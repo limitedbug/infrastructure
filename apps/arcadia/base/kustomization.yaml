@@ -6,3 +6,4 @@ resources:
   - arcadia
   - httproute.yaml
   - certificate.yaml
+  - reference-grant.yaml
