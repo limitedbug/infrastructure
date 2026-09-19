@@ -12,3 +12,16 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+
+    - name: https-arcadia
+      protocol: HTTPS
+      port: 443
+      hostname: arcadia.good-robert.com
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: arcadia-good-robert-com-tls
+            kind: Secret
+      allowedRoutes:
+        namespaces:
+          from: All

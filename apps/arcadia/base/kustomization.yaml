@@ -5,3 +5,4 @@ resources:
   - mongodb
   - arcadia
   - httproute.yaml
+  - certificate.yaml
