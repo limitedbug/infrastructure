@@ -38,6 +38,9 @@ spec:
 
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
+
+    - group: gateway.networking.k8s.io
+      kind: ReferenceGrant
     
     - group: cert-manager.io
       kind: Certificate
