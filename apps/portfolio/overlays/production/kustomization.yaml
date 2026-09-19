@@ -5,20 +5,19 @@ namespace: portfolio
 nameSuffix: -prod
 
 resources:
-  - ../../base
+- ../../base
 
 labels:
-  - includeSelectors: false
-    pairs:
-      app.kubernetes.io/instance: production
+- pairs:
+    app.kubernetes.io/instance: production
 
-images:
   # Pinned to a release on purpose. The release workflow rewrites this to the
   # immutable digest it just pushed, so what runs in production is always a
   # build that exists and can be rolled back to.
-  - name: ghcr.io/limitedbug/portfolio
-    newName: ghcr.io/limitedbug/portfolio
-    newTag: v1.0.0
+images:
+- digest: sha256:3ab476f179b5e6f38409070995994310c22288604f20f0409d1968842677462f
+  name: ghcr.io/limitedbug/portfolio
+  newName: ghcr.io/limitedbug/portfolio
 
 patches:
-  - path: patch-scale.yaml
+- path: patch-scale.yaml
