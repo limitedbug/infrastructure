@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: arcadia-config
+data:
+  NEXTAUTH_URL: "https://arcadia.good-robert.com"
+  PORT: "3000"
+  HOSTNAME: "0.0.0.0"
+  NODE_ENV: "production"
