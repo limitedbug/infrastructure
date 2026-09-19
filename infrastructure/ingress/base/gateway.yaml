@@ -21,6 +21,7 @@ spec:
         mode: Terminate
         certificateRefs:
           - name: arcadia-good-robert-com-tls
+            namespace: arcadia
             kind: Secret
       allowedRoutes:
         namespaces:
