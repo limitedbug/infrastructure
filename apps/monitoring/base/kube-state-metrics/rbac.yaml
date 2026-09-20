@@ -97,6 +97,7 @@ rules:
       - mutatingwebhookconfigurations
       - validatingwebhookconfigurations
       - mutatingadmissionpolicies
+      - mutatingadmissionpolicybindings
       - validatingadmissionpolicies
       - validatingadmissionpolicybindings
     verbs:
