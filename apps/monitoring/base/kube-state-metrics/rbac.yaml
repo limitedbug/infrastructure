@@ -90,6 +90,34 @@ rules:
     verbs:
       - list
       - watch
+
+  - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+      - mutatingadmissionpolicies
+      - validatingadmissionpolicies
+      - validatingadmissionpolicybindings
+    verbs:
+      - list
+      - watch
+
+  - apiGroups:
+      - certificates.k8s.io
+    resources:
+      - certificatesigningrequests
+    verbs:
+      - list
+      - watch
+
+  - apiGroups:
+      - discovery.k8s.io
+    resources:
+      - endpointslices
+    verbs:
+      - list
+      - watch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

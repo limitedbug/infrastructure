@@ -27,16 +27,14 @@ spec:
               protocol: TCP
 
           readinessProbe:
-            httpGet:
-              path: /readyz
-              port: 8081
+            tcpSocket:
+              port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
 
           livenessProbe:
-            httpGet:
-              path: /livez
-              port: 8081
+            tcpSocket:
+              port: 8080
             initialDelaySeconds: 10
             periodSeconds: 20
 
