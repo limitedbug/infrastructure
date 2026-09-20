@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: minecraft-migration
+  namespace: minecraft
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: ubuntu
+
+  restartPolicy: Never
+
+  containers:
+    - name: migration
+      image: alpine:3.22
+      command:
+        - /bin/sh
+        - -c
+        - |
+          echo "=== Minecraft migration pod ==="
+          echo "Source:"
+          ls -lah /source
+          echo
+          echo "Target:"
+          ls -lah /data
+          echo
+          echo "Pod ready for migration."
+          sleep 3600
+
+      volumeMounts:
+        - name: minecraft-data
+          mountPath: /data
+
+        - name: minecraft-source
+          mountPath: /source
+          readOnly: true
+
+  volumes:
+    - name: minecraft-data
+      persistentVolumeClaim:
+        claimName: minecraft-data
+
+    - name: minecraft-source
+      hostPath:
+        path: /home/admin/jp
+        type: Directory

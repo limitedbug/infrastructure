@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minecraft
+  namespace: minecraft
+spec:
+  serviceName: minecraft
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: minecraft
+
+  template:
+    metadata:
+      labels:
+        app: minecraft
+
+    spec:
+      terminationGracePeriodSeconds: 120
+
+      securityContext:
+        fsGroup: 1000
+
+      containers:
+        - name: minecraft
+          image: eclipse-temurin:25-jre
+          workingDir: /data
+
+          command:
+            - java
+            - -Xms4G
+            - -Xmx4G
+            - -jar
+            - /data/server.jar
+            - nogui
+
+          ports:
+            - name: minecraft
+              containerPort: 25565
+              protocol: TCP
+
+          resources:
+            requests:
+              cpu: "1"
+              memory: 4Gi
+            limits:
+              cpu: "6"
+              memory: 6Gi
+
+          volumeMounts:
+            - name: minecraft-data
+              mountPath: /data
+
+          readinessProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 12
+
+          livenessProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+      volumes:
+        - name: minecraft-data
+          persistentVolumeClaim:
+            claimName: minecraft-data
