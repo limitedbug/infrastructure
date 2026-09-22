@@ -2,4 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../../base
+- ../../base
+images:
+- digest: sha256:155b4cdcfe442f5620c12fa054f5fc735ee1be2ac5c5570949b616c351f7a0d5
+  name: ghcr.io/limitedbug/arcadia
+  newName: ghcr.io/limitedbug/arcadia
